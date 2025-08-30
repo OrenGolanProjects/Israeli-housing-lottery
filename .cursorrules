@@ -1,0 +1,134 @@
+# Israeli Housing Lottery Project - Cursor AI Rules
+
+## Project Context
+This is a React TypeScript project for displaying Israeli housing lottery data with interactive maps and filtering. The app helps users explore government housing lottery projects across Israeli cities.
+
+## Technology Stack
+- React 18+ with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- Lucide React for icons
+- Date-fns for date handling
+- Future: Leaflet for maps, SQLite WASM for local database
+
+## Code Style & Conventions
+
+### TypeScript Rules
+- Always use TypeScript for all React components
+- Define proper interfaces for all data structures
+- Use strict type checking
+- Prefer interfaces over types for object shapes
+- Use proper return types for all functions
+
+### React Component Rules
+- Use functional components with hooks only
+- Props should be properly typed with interfaces
+- Use React.FC<PropsInterface> for component typing
+- Components should be organized in feature-based folders
+- Each component should have a single responsibility
+
+### Naming Conventions
+- Components: PascalCase (e.g., ProjectDetails.tsx)
+- Files: PascalCase for components, camelCase for utilities
+- Variables/functions: camelCase
+- Constants: SCREAMING_SNAKE_CASE
+- Interfaces: PascalCase with descriptive names
+
+### File Organization
+```
+src/
+├── components/
+│   ├── layout/      # Layout components (TopBar, MainLayout)
+│   ├── map/         # Map-related components
+│   ├── filters/     # Filter components
+│   └── ui/          # Reusable UI components
+├── types/           # TypeScript interfaces
+├── hooks/           # Custom React hooks
+├── utils/           # Utility functions
+├── data/            # Mock data and constants
+└── styles/          # Global styles
+```
+
+### Hebrew/RTL Support Rules
+- All Hebrew text should be wrapped in proper RTL containers
+- Use `dir="rtl"` for Hebrew input fields
+- Text should be right-aligned for Hebrew content
+- Use space-x-reverse for RTL flex layouts
+- Consider Hebrew number formatting for prices
+
+### Styling Rules (Tailwind CSS)
+- Use Tailwind utility classes primarily
+- Follow mobile-first responsive design
+- Use consistent spacing scale (4px base unit)
+- Maintain consistent color scheme:
+  - Primary: blue-500 (#3b82f6)
+  - Secondary: gray-500 (#6b7280)
+  - Success: green-500
+  - Warning: yellow-500
+  - Error: red-500
+- Use semantic color names in tailwind.config.js
+
+### Component Structure Rules
+- Import order: React, third-party libraries, local imports
+- Props interface should be defined above the component
+- Use destructuring for props
+- Handle loading and error states appropriately
+- Add proper accessibility attributes where needed
+
+## Specific Project Rules
+
+### Data Handling
+- Use ProcessedProperty interface for UI display data
+- Use HousingLotteryProperty for raw API data
+- Always format prices with Hebrew number formatting
+- Handle Hebrew text encoding properly
+- Calculate competition ratios as subscribers/winners
+
+### Map Components (Future Phase 2)
+- Implement zoom-based display logic
+- Use color coding for competition ratios
+- Handle marker clustering appropriately
+- Optimize for performance with large datasets
+
+### Performance Rules
+- Use React.memo for expensive components
+- Implement proper state management
+- Avoid unnecessary re-renders
+- Use proper key props in lists
+- Debounce filter changes
+
+### Error Handling
+- Always handle potential null/undefined values
+- Provide fallback UI for error states
+- Use proper TypeScript error types
+- Add loading states for async operations
+
+## Code Generation Guidelines
+
+### When creating components:
+1. Always include proper TypeScript interfaces
+2. Add comprehensive JSDoc comments for complex functions
+3. Include proper error boundaries where appropriate
+4. Follow the established file structure
+5. Use consistent naming conventions
+6. Add proper accessibility attributes
+
+### When working with Hebrew content:
+1. Ensure proper RTL text direction
+2. Use Hebrew-appropriate date formatting
+3. Handle Hebrew number formatting for prices
+4. Consider text alignment and spacing
+
+### For state management:
+1. Use React Context for global state
+2. Use local state for component-specific data
+3. Implement proper state updates (immutable patterns)
+4. Use proper dependency arrays in useEffect
+
+## AI Assistant Guidelines
+- Always suggest TypeScript-first solutions
+- Recommend proper component structure
+- Consider Hebrew/RTL requirements in suggestions
+- Prioritize accessibility and performance
+- Follow established project patterns
+- Suggest proper error handling patterns
