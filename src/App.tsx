@@ -67,6 +67,29 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
   const isLaptop = useMediaQuery(theme.breakpoints.between('lg', 'xl'));
 
+  // Helper function to calculate active filters
+  const getActiveFilterInfo = () => {
+    const hasActiveFilters = 
+      (filters.selectedCity && filters.selectedCity.trim() !== '') ||
+      (filters.maxPrice && filters.maxPrice.trim() !== '') ||
+      filters.selectedStatus.length > 0 ||
+      filters.selectedConstructionPermits.length > 0 ||
+      filters.selectedEligibilityTypes.length > 0 ||
+      (filters.searchQuery && filters.searchQuery.trim() !== '');
+    
+    let activeFilterCount = 0;
+    if (filters.selectedCity && filters.selectedCity.trim() !== '') activeFilterCount++;
+    if (filters.maxPrice && filters.maxPrice.trim() !== '') activeFilterCount++;
+    if (filters.selectedStatus.length > 0) activeFilterCount++;
+    if (filters.selectedConstructionPermits.length > 0) activeFilterCount++;
+    if (filters.selectedEligibilityTypes.length > 0) activeFilterCount++;
+    if (filters.searchQuery && filters.searchQuery.trim() !== '') activeFilterCount++;
+    
+    return { hasActiveFilters: Boolean(hasActiveFilters), activeFilterCount };
+  };
+
+  const { hasActiveFilters, activeFilterCount } = getActiveFilterInfo();
+
   const layoutConfig = {
     stacked: isMobile || isTablet,
     leftWidth: isMobile ? '100%' : isTablet ? '100%' : isLaptop ? 260 : 280,
@@ -83,6 +106,9 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           onSearchChange={(query) => updateFilters({ searchQuery: query })}
           filteredCount={stats.filteredCount}
           totalCount={stats.totalProjects}
+          hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
+          onClearFilters={clearFilters}
         />
         <Box sx={{ flex: 1, overflow: 'auto' }}>
           <Box sx={{ 
@@ -139,6 +165,9 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         onSearchChange={(query) => updateFilters({ searchQuery: query })}
         filteredCount={stats.filteredCount}
         totalCount={stats.totalProjects}
+        hasActiveFilters={hasActiveFilters}
+        activeFilterCount={activeFilterCount}
+        onClearFilters={clearFilters}
       />
       <Box sx={{ 
         display: 'flex', 

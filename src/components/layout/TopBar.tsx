@@ -1,18 +1,24 @@
 import { Box, AppBar, Toolbar, Typography, TextField, InputAdornment, Button, useMediaQuery, useTheme } from '@mui/material';
-import { Search, Home } from '@mui/icons-material';
+import { Search, Home, Clear } from '@mui/icons-material';
 
 interface TopBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   filteredCount: number;
   totalCount: number;
+  hasActiveFilters: boolean;
+  activeFilterCount: number;
+  onClearFilters: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
   searchQuery,
   onSearchChange,
   filteredCount,
-  totalCount
+  totalCount,
+  hasActiveFilters,
+  activeFilterCount,
+  onClearFilters
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -77,6 +83,76 @@ const TopBar: React.FC<TopBarProps> = ({
               }}
             />
           </Box>
+
+          {/* Active Filters Section */}
+          {hasActiveFilters && (
+            <Box id="topbar-active-filters" sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 2,
+              flexShrink: 0,
+              p: 1.5,
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              borderRadius: 3,
+              border: '2px solid #f59e0b',
+              minWidth: 0
+            }}>
+              <Box id="topbar-filters-info" sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, minWidth: 0 }}>
+                <Typography 
+                  id="topbar-filters-title"
+                  variant="body2" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    color: '#92400e',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.2
+                  }}
+                >
+                  מסננים פעילים
+                </Typography>
+                <Typography 
+                  id="topbar-filters-count"
+                  variant="caption" 
+                  sx={{ 
+                    color: '#92400e', 
+                    opacity: 0.8,
+                    fontSize: { xs: '0.625rem', sm: '0.75rem' },
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.2
+                  }}
+                >
+                  {activeFilterCount} מסננים מופעלים כרגע
+                </Typography>
+              </Box>
+              <Button
+                id="topbar-clear-filters-button"
+                variant="outlined"
+                color="warning"
+                startIcon={<Clear />}
+                onClick={onClearFilters}
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  px: 1.5,
+                  py: 0.25,
+                  fontWeight: 600,
+                  borderWidth: 2,
+                  borderColor: '#f59e0b',
+                  color: '#92400e',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  minWidth: 'auto',
+                  '&:hover': {
+                    backgroundColor: '#fef3c7',
+                    borderColor: '#d97706',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+              >
+                נקה
+              </Button>
+            </Box>
+          )}
 
           {/* Project Count Button */}
           <Button
