@@ -121,7 +121,6 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             <FiltersPanel
               filters={filters}
               onFilterChange={updateFilters}
-              onClearFilters={clearFilters}
               cities={cities}
               statuses={statuses}
               constructionPermits={constructionPermits}
@@ -191,7 +190,6 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             <FiltersPanel
               filters={filters}
               onFilterChange={updateFilters}
-              onClearFilters={clearFilters}
               cities={cities}
               statuses={statuses}
               constructionPermits={constructionPermits}
