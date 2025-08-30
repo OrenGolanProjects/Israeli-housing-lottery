@@ -1,3 +1,311 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Hebrew Font Support */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px; /* Base font size reduction */
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.hebrew-text {
+  font-family: 'Heebo', sans-serif;
+}
+
+/* Global font size reduction for better readability */
+* {
+  font-size: inherit;
+}
+
+/* Ensure MUI components use smaller fonts */
+.MuiTypography-root {
+  font-size: inherit !important;
+}
+
+/* Specific adjustments for common text elements */
+.MuiTypography-h1 { font-size: 1.75rem !important; }
+.MuiTypography-h2 { font-size: 1.5rem !important; }
+.MuiTypography-h3 { font-size: 1.25rem !important; }
+.MuiTypography-h4 { font-size: 1.125rem !important; }
+.MuiTypography-h5 { font-size: 1rem !important; }
+.MuiTypography-h6 { font-size: 0.875rem !important; }
+.MuiTypography-subtitle1 { font-size: 0.875rem !important; }
+.MuiTypography-subtitle2 { font-size: 0.75rem !important; }
+.MuiTypography-body1 { font-size: 0.875rem !important; }
+.MuiTypography-body2 { font-size: 0.75rem !important; }
+.MuiTypography-button { font-size: 0.75rem !important; }
+.MuiTypography-caption { font-size: 0.625rem !important; }
+.MuiTypography-overline { font-size: 0.625rem !important; }
+
+/* Form elements and other MUI components */
+.MuiInputLabel-root { font-size: 0.75rem !important; }
+.MuiInputBase-input { font-size: 0.875rem !important; }
+.MuiSelect-select { font-size: 0.875rem !important; }
+.MuiMenuItem-root { font-size: 0.875rem !important; }
+.MuiButton-root { font-size: 0.75rem !important; }
+.MuiChip-root { font-size: 0.75rem !important; }
+.MuiChip-label { font-size: 0.75rem !important; }
+.MuiFormHelperText-root { font-size: 0.625rem !important; }
+
+/* Ensure consistent font sizes for all text elements */
+.MuiBox-root, .MuiPaper-root, .MuiCard-root {
+  font-size: inherit;
+}
+
+/* Additional font size reductions for better mobile experience */
+@media (max-width: 768px) {
+  .MuiTypography-h1 { font-size: 1.5rem !important; }
+  .MuiTypography-h2 { font-size: 1.25rem !important; }
+  .MuiTypography-h3 { font-size: 1.125rem !important; }
+  .MuiTypography-h4 { font-size: 1rem !important; }
+  .MuiTypography-h5 { font-size: 0.875rem !important; }
+  .MuiTypography-h6 { font-size: 0.75rem !important; }
+  .MuiTypography-subtitle1 { font-size: 0.75rem !important; }
+  .MuiTypography-subtitle2 { font-size: 0.625rem !important; }
+  .MuiTypography-body1 { font-size: 0.75rem !important; }
+  .MuiTypography-body2 { font-size: 0.625rem !important; }
+  .MuiTypography-button { font-size: 0.625rem !important; }
+  .MuiTypography-caption { font-size: 0.5rem !important; }
+  .MuiTypography-overline { font-size: 0.5rem !important; }
+  
+  /* Mobile-specific form element adjustments */
+  .MuiInputLabel-root { font-size: 0.625rem !important; }
+  .MuiInputBase-input { font-size: 0.75rem !important; }
+  .MuiSelect-select { font-size: 0.75rem !important; }
+  .MuiMenuItem-root { font-size: 0.75rem !important; }
+  .MuiButton-root { font-size: 0.625rem !important; }
+  .MuiChip-root { font-size: 0.625rem !important; }
+  .MuiChip-label { font-size: 0.625rem !important; }
+}
+
+/* Additional global font size controls */
+.MuiAppBar-root .MuiTypography-root,
+.MuiToolbar-root .MuiTypography-root {
+  font-size: inherit !important;
+}
+
+/* Ensure all text elements inherit the smaller font size */
+.MuiListItem-root,
+.MuiListItemButton-root,
+.MuiCardContent-root,
+.MuiPaper-root {
+  font-size: inherit;
+}
+
+/* Leaflet Map Styles */
+.leaflet-container {
+  font-family: 'Heebo', sans-serif;
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 400px !important;
+}
+
+.leaflet-container .leaflet-pane {
+  height: 100% !important;
+}
+
+/* Ensure tile pane is always visible and properly layered */
+.leaflet-tile-pane {
+  z-index: 200 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Smooth transitions for map interactions */
+.leaflet-container {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Enhanced marker transitions */
+.custom-marker {
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-marker div {
+  font-family: 'Heebo', sans-serif;
+  transition: all 0.3s ease-in-out;
+  /* Ensure text is always readable */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enhanced marker visibility with subtle shadows */
+.custom-marker div {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Ensure selected markers are even more visible */
+.custom-marker div[style*="scale(1.1)"],
+.custom-marker div[style*="scale(1.2)"] {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Ensure map container is always visible */
+#map-leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 400px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Map zoom animations */
+.leaflet-zoom-animated {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Marker bounce animation */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Pulse animation for selected property indicator */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ensure map is properly focused when property is selected */
+.leaflet-container.leaflet-fade-anim .leaflet-tile,
+.leaflet-container.leaflet-fade-anim .leaflet-popup {
+  opacity: 1 !important;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#app-center-map {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 !important;
+}
+
+#map-main-container {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 !important;
+}
+
+/* Layout Container Fixes */
+#app-horizontal-layout {
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+#app-horizontal-content {
+  flex: 1 !important;
+  height: calc(100vh - 88px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+#app-left-sidebar {
+  flex-shrink: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+#app-right-sidebar {
+  flex-shrink: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+#app-left-sidebar-stats {
+  flex: 1 !important;
+  overflow: auto !important;
+  min-height: 0 !important;
+}
+
+#app-right-sidebar-properties {
+  flex: 1 !important;
+  overflow: auto !important;
+  min-height: 0 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  font-family: 'Heebo', sans-serif;
+  font-size: 0.875rem !important;
+}
+
+/* Ensure map popup text is also smaller */
+.leaflet-popup-content .MuiTypography-root {
+  font-size: inherit !important;
+}
+
+.leaflet-popup-content h1, .leaflet-popup-content h2, .leaflet-popup-content h3,
+.leaflet-popup-content h4, .leaflet-popup-content h5, .leaflet-popup-content h6 {
+  font-size: 0.875rem !important;
+  margin: 0.25rem 0 !important;
+}
+
+.leaflet-popup-content p, .leaflet-popup-content span, .leaflet-popup-content div {
+  font-size: 0.75rem !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
