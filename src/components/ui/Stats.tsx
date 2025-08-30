@@ -183,7 +183,7 @@ const Stats: React.FC<StatsProps> = ({ stats }) => {
                 <item.icon id={`stats-card-icon-${index}`} sx={{ fontSize: 16 }} />
               </Avatar>
               
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ flex: 1, minWidth: 0, mr: 2 }}>
                 <Typography
                   id={`stats-card-description-${index}`}
                   variant="caption"
@@ -226,7 +226,8 @@ const Stats: React.FC<StatsProps> = ({ stats }) => {
                   fontSize: '1.25rem',
                   lineHeight: 1.2,
                   flexShrink: 0,
-                  textAlign: 'right'
+                  textAlign: 'right',
+                  minWidth: 'fit-content'
                 }}
               >
                 {item.value}
