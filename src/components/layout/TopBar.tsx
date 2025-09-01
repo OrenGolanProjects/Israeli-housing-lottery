@@ -4,6 +4,8 @@ import { Search, Home, Clear } from '@mui/icons-material';
 interface TopBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onSearchSubmit: (query: string) => void;
+  isLoading?: boolean;
   filteredCount: number;
   totalCount: number;
   hasActiveFilters: boolean;
@@ -14,6 +16,8 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({
   searchQuery,
   onSearchChange,
+  onSearchSubmit,
+  isLoading = false,
   filteredCount,
   totalCount,
   hasActiveFilters,
@@ -34,24 +38,29 @@ const TopBar: React.FC<TopBarProps> = ({
             <Box id="topbar-title-container" sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography
                 id="topbar-main-title"
-                variant={isMobile ? 'h6' : 'h5'}
+                variant={isMobile ? 'h5' : 'h4'}
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 800,
                   color: 'text.primary',
-                  lineHeight: 1.2
+                  lineHeight: 1.2,
+                  fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+                  letterSpacing: '-0.02em',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.05)'
                 }}
               >
                 דירה להשכרה
               </Typography>
               <Typography
                 id="topbar-subtitle"
-                variant={isMobile ? 'caption' : 'body2'}
+                variant={isMobile ? 'body2' : 'body1'}
                 sx={{
                   color: 'text.secondary',
-                  lineHeight: 1.2
+                  lineHeight: 1.3,
+                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.125rem' },
+                  fontWeight: 500
                 }}
               >
-                מערכת הגרלות דיור ממשלתיות
+                Israeli Housing Lottery
               </Typography>
             </Box>
           </Box>
@@ -61,27 +70,61 @@ const TopBar: React.FC<TopBarProps> = ({
             <TextField
               id="topbar-search-input"
               fullWidth
-              size={isMobile ? 'small' : 'medium'}
+              size={isMobile ? 'medium' : 'medium'}
               placeholder="חפש פרוייקט או עיר..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  onSearchSubmit(searchQuery);
+                }
+              }}
+              aria-label="חיפוש פרוייקטים וערים"
+              inputProps={{
+                'aria-describedby': 'search-description'
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment id="topbar-search-icon" position="start">
-                    <Search sx={{ color: 'text.secondary' }} />
+                    {isLoading ? (
+                      <Box sx={{ width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Box sx={{
+                          width: 16,
+                          height: 16,
+                          border: '2px solid #e5e7eb',
+                          borderTop: '2px solid #3b82f6',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }} />
+                      </Box>
+                    ) : (
+                      <Search sx={{ color: 'text.secondary' }} />
+                    )}
                   </InputAdornment>
                 ),
                 sx: {
                   borderRadius: 2,
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'grey.300',
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
+                  '& .MuiInputBase-input': {
+                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                    fontWeight: 500
+                  }
                 }
               }}
             />
+            <Typography 
+              id="search-description" 
+              variant="caption" 
+              sx={{ display: 'none' }}
+            >
+              חיפוש פרוייקטים וערים במערכת ההגרלות
+            </Typography>
           </Box>
 
           {/* Active Filters Section */}
@@ -104,22 +147,22 @@ const TopBar: React.FC<TopBarProps> = ({
                   sx={{ 
                     fontWeight: 700, 
                     color: '#92400e',
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
                     whiteSpace: 'nowrap',
-                    lineHeight: 1.2
+                    lineHeight: 1.3
                   }}
                 >
                   מסננים פעילים
                 </Typography>
                 <Typography 
                   id="topbar-filters-count"
-                  variant="caption" 
+                  variant="body2" 
                   sx={{ 
                     color: '#92400e', 
                     opacity: 0.8,
-                    fontSize: { xs: '0.625rem', sm: '0.75rem' },
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     whiteSpace: 'nowrap',
-                    lineHeight: 1.2
+                    lineHeight: 1.3
                   }}
                 >
                   {activeFilterCount} מסננים מופעלים כרגע
@@ -135,12 +178,12 @@ const TopBar: React.FC<TopBarProps> = ({
                 sx={{
                   borderRadius: 2,
                   px: 1.5,
-                  py: 0.25,
+                  py: 0.5,
                   fontWeight: 600,
                   borderWidth: 2,
                   borderColor: '#f59e0b',
                   color: '#92400e',
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
                   minWidth: 'auto',
                   '&:hover': {
                     backgroundColor: '#fef3c7',
@@ -154,17 +197,21 @@ const TopBar: React.FC<TopBarProps> = ({
             </Box>
           )}
 
+
+
           {/* Project Count Button */}
           <Button
             id="topbar-project-count"
             variant="contained"
-            size={isMobile ? 'small' : 'medium'}
+            size={isMobile ? 'medium' : 'medium'}
             sx={{
               borderRadius: 2,
               px: isMobile ? 2 : 3,
               py: isMobile ? 1 : 1.5,
               minWidth: 'auto',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              fontWeight: 600
             }}
           >
             {isSmallMobile ? `${filteredCount}/${totalCount}` : `מתוך ${totalCount} פרוייקטים ${filteredCount}`}

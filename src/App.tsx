@@ -1,7 +1,6 @@
 import { Box, CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { sampleProperties, cities, statuses, constructionPermits, eligibilityTypes } from './data';
-import { useAppState } from './hooks/useAppState';
 import { useBrowserDimensions } from './hooks/useBrowserDimensions';
 import type { Property, FilterState, ProjectStats } from './types';
 import TopBar from './components/layout/TopBar';
@@ -10,24 +9,26 @@ import PropertiesList from './components/filters/PropertiesList';
 import Map from './components/map/Map';
 import PropertyDetailsPanel from './components/ui/PropertyDetailsPanel';
 import Stats from './components/ui/Stats';
+import { useAppState } from './hooks/useAppState';
 
 const theme = createTheme({
   direction: 'rtl',
   typography: {
     fontFamily: 'Heebo, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-    h1: { fontSize: '1.75rem' },
-    h2: { fontSize: '1.5rem' },
-    h3: { fontSize: '1.25rem' },
-    h4: { fontSize: '1.125rem' },
-    h5: { fontSize: '1rem' },
-    h6: { fontSize: '0.875rem' },
-    subtitle1: { fontSize: '0.875rem' },
-    subtitle2: { fontSize: '0.75rem' },
-    body1: { fontSize: '0.875rem' },
-    body2: { fontSize: '0.75rem' },
-    button: { fontSize: '0.75rem' },
-    caption: { fontSize: '0.625rem' },
-    overline: { fontSize: '0.625rem' },
+    // Larger, more professional font sizes
+    h1: { fontSize: '2.5rem', fontWeight: 700, lineHeight: 1.2 },
+    h2: { fontSize: '2rem', fontWeight: 600, lineHeight: 1.3 },
+    h3: { fontSize: '1.75rem', fontWeight: 600, lineHeight: 1.3 },
+    h4: { fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.4 },
+    h5: { fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.4 },
+    h6: { fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.4 },
+    subtitle1: { fontSize: '1.125rem', fontWeight: 500, lineHeight: 1.5 },
+    subtitle2: { fontSize: '1rem', fontWeight: 500, lineHeight: 1.5 },
+    body1: { fontSize: '1.125rem', fontWeight: 400, lineHeight: 1.6 },
+    body2: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.6 },
+    button: { fontSize: '1rem', fontWeight: 600, lineHeight: 1.5 },
+    caption: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.5 },
+    overline: { fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5 },
   },
   palette: {
     primary: { main: '#1976d2' },
@@ -41,8 +42,11 @@ interface ResponsiveLayoutProps {
   selectedProperty: Property | null;
   stats: ProjectStats;
   updateFilters: (filters: Partial<FilterState>) => void;
-  clearFilters: () => void;
+  clearFilters: () => Promise<void>;
   selectProperty: (property: Property | null) => void;
+  handleSearchSubmit: (query: string) => void;
+  isLoading: boolean;
+  currentSearchQuery: string;
   cities: string[];
   statuses: string[];
   constructionPermits: string[];
@@ -57,6 +61,9 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
   updateFilters,
   clearFilters,
   selectProperty,
+  handleSearchSubmit,
+  isLoading,
+  currentSearchQuery,
   cities,
   statuses,
   constructionPermits,
@@ -100,12 +107,20 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
 
   if (layoutConfig.stacked) {
     return (
-      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Box sx={{ 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        overflow: 'hidden',
+        mx: { xs: 2, sm: 3, md: 4 }
+      }}>
         <TopBar
           searchQuery={filters.searchQuery}
           onSearchChange={(query) => updateFilters({ searchQuery: query })}
-          filteredCount={stats.filteredCount}
-          totalCount={stats.totalProjects}
+          onSearchSubmit={handleSearchSubmit}
+          isLoading={isLoading}
+          filteredCount={stats?.filteredCount || 0}
+          totalCount={stats?.totalProjects || 0}
           hasActiveFilters={hasActiveFilters}
           activeFilterCount={activeFilterCount}
           onClearFilters={clearFilters}
@@ -116,7 +131,8 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             bgcolor: 'white',
             borderBottom: 1,
             borderColor: 'grey.200',
-            p: layoutConfig.padding
+            p: layoutConfig.padding,
+            mx: 'auto'
           }}>
             <FiltersPanel
               filters={filters}
@@ -126,11 +142,16 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
               constructionPermits={constructionPermits}
               eligibilityTypes={eligibilityTypes}
             />
-            <Stats stats={stats} />
+            <Stats stats={stats || {}} />
           </Box>
-          <Box sx={{ height: layoutConfig.mapHeight, bgcolor: 'white' }}>
+          <Box sx={{ 
+            height: layoutConfig.mapHeight, 
+            bgcolor: 'white',
+            mx: { xs: 1, sm: 2 },
+            my: 1
+          }}>
             <Map
-              properties={filteredProperties}
+              properties={filteredProperties || []}
               selectedProperty={selectedProperty}
               onPropertySelect={selectProperty}
             />
@@ -140,10 +161,10 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             bgcolor: 'white',
             borderTop: 1,
             borderColor: 'grey.200',
-            position: 'relative'
+            mx: 'auto'
           }}>
             <PropertiesList
-              properties={filteredProperties}
+              properties={filteredProperties || []}
               selectedProperty={selectedProperty}
               onPropertySelect={selectProperty}
             />
@@ -158,12 +179,20 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
   }
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      overflow: 'hidden',
+      mx: { xs: 2, sm: 3, md: 4, lg: 6, xl: 8 }
+    }}>
       <TopBar
         searchQuery={filters.searchQuery}
         onSearchChange={(query) => updateFilters({ searchQuery: query })}
-        filteredCount={stats.filteredCount}
-        totalCount={stats.totalProjects}
+        onSearchSubmit={handleSearchSubmit}
+        isLoading={isLoading}
+        filteredCount={stats?.filteredCount || 0}
+        totalCount={stats?.totalProjects || 0}
         hasActiveFilters={hasActiveFilters}
         activeFilterCount={activeFilterCount}
         onClearFilters={clearFilters}
@@ -173,7 +202,8 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         flex: 1, 
         height: 'calc(100vh - 88px)', 
         minHeight: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        gap: { xs: 1, sm: 2, md: 3, lg: 4 }
       }}>
         <Box sx={{ 
           width: layoutConfig.leftWidth, 
@@ -197,19 +227,18 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             />
           </Box>
           <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
-            <Stats stats={stats} />
+            <Stats stats={stats || {}} />
           </Box>
         </Box>
         <Box sx={{ 
-          flex: 1, 
-          minWidth: 0, 
+          flex: 1,
           minHeight: 0,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column'
         }}>
           <Map
-            properties={filteredProperties}
+            properties={filteredProperties || []}
             selectedProperty={selectedProperty}
             onPropertySelect={selectProperty}
           />
@@ -227,9 +256,10 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         }}>
           <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
             <PropertiesList
-              properties={filteredProperties}
+              properties={filteredProperties || []}
               selectedProperty={selectedProperty}
               onPropertySelect={selectProperty}
+              currentSearchQuery={currentSearchQuery}
             />
           </Box>
           <PropertyDetailsPanel 
@@ -250,9 +280,12 @@ function App() {
     filteredProperties,
     selectedProperty,
     stats,
+    isLoading,
+    currentSearchQuery,
     updateFilters,
     clearFilters,
-    selectProperty
+    selectProperty,
+    handleSearchSubmit
   } = useAppState({ properties: sampleProperties });
 
   return (
@@ -266,6 +299,9 @@ function App() {
         updateFilters={updateFilters}
         clearFilters={clearFilters}
         selectProperty={selectProperty}
+        handleSearchSubmit={handleSearchSubmit}
+        isLoading={isLoading}
+        currentSearchQuery={currentSearchQuery}
         cities={cities}
         statuses={statuses}
         constructionPermits={constructionPermits}

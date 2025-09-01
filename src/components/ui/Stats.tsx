@@ -1,9 +1,8 @@
+import React, { useMemo } from 'react';
 import { 
   Box, 
   Typography, 
   Paper, 
-  useMediaQuery, 
-  useTheme,
   Card,
   CardContent,
   Avatar
@@ -12,222 +11,172 @@ import {
   Home, 
   People, 
   EmojiEvents, 
-  TrendingUp, 
-  BarChart
+  BarChart,
+  AttachMoney,
+  Groups
 } from '@mui/icons-material';
 import type { ProjectStats } from '../../types';
 import { formatPrice } from '../../utils/formatters';
 
 interface StatsProps {
   stats: ProjectStats;
+  variant?: 'default' | 'compact';
 }
 
-const Stats: React.FC<StatsProps> = ({ stats }) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+const Stats: React.FC<StatsProps> = ({ stats, variant = 'default' }) => {
+  const safeStats = useMemo(() => ({
+    totalProjects: stats?.totalProjects || 0,
+    totalUnits: stats?.totalUnits || 0,
+    totalSubscribers: stats?.totalSubscribers || 0,
+    totalWinners: stats?.totalWinners || 0,
+    averagePrice: stats?.averagePrice || 0,
+    averageCompetitionRatio: stats?.averageCompetitionRatio || 0
+  }), [stats]);
 
-  const statItems = [
+  const statItems = useMemo(() => [
     {
       icon: Home,
       label: 'פרוייקטים',
-      value: stats.totalProjects.toLocaleString('he-IL'),
+      value: safeStats.totalProjects.toLocaleString('he-IL'),
       color: '#3b82f6',
-      bgColor: '#eff6ff',
-      borderColor: '#3b82f6',
-      iconBg: '#3b82f6',
-      description: 'סה״כ פרוייקטים פעילים'
+      bgColor: '#eff6ff'
     },
     {
       icon: People,
       label: 'יחידות דיור',
-      value: stats.totalUnits.toLocaleString('he-IL'),
-      color: '#059669',
-      bgColor: '#ecfdf5',
-      borderColor: '#059669',
-      iconBg: '#059669',
-      description: 'יחידות זמינות להרשמה'
+      value: safeStats.totalUnits.toLocaleString('he-IL'),
+      color: '#10b981',
+      bgColor: '#ecfdf5'
     },
     {
       icon: EmojiEvents,
       label: 'זוכים',
-      value: stats.totalWinners.toLocaleString('he-IL'),
-      color: '#dc2626',
-      bgColor: '#fef2f2',
-      borderColor: '#dc2626',
-      iconBg: '#dc2626',
-      description: 'משתתפים שזכו בהגרלה'
+      value: safeStats.totalWinners.toLocaleString('he-IL'),
+      color: '#ef4444',
+      bgColor: '#fef2f2'
     },
     {
-      icon: TrendingUp,
+      icon: AttachMoney,
       label: 'מחיר ממוצע למ״ר',
-      value: `₪${formatPrice(stats.averagePrice)}`,
-      color: '#ea580c',
-      bgColor: '#fff7ed',
-      borderColor: '#ea580c',
-      iconBg: '#ea580c',
-      description: 'מחיר ממוצע למ״ר בפרוייקטים'
+      value: `₪${formatPrice(safeStats.averagePrice)}`,
+      color: '#f59e0b',
+      bgColor: '#fffbeb'
+    },
+    {
+      icon: BarChart,
+      label: 'יחס תחרות ממוצע',
+      value: `${safeStats.averageCompetitionRatio.toFixed(1)}:1`,
+      color: '#8b5cf6',
+      bgColor: '#f3f4f6'
+    },
+    {
+      icon: Groups,
+      label: 'נרשמים',
+      value: safeStats.totalSubscribers?.toLocaleString('he-IL') || '0',
+      color: '#06b6d4',
+      bgColor: '#ecfeff'
     }
-  ];
+  ], [safeStats]);
+
+  const displayItems = variant === 'compact' 
+    ? statItems.slice(0, 4) 
+    : statItems;
 
   return (
     <Paper 
-      id="stats-main-panel"
       elevation={0} 
       sx={{ 
-        p: { xs: 2, sm: 3, md: 4 }, 
-        borderBottom: 1, 
-        borderColor: 'grey.100',
+        p: variant === 'compact' ? 2 : 3,
         bgcolor: 'background.paper',
-        borderRadius: 0,
-        height: '100%',
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column'
+        height: '100%'
       }}
     >
-      <Box id="stats-header" sx={{ 
-        display: 'flex', 
-        alignItems: 'center',
-        gap: 2, 
-        mb: { xs: 2, sm: 3, md: 4 },
-        p: 3,
-        bgcolor: 'grey.50',
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'grey.200'
-      }}>
-        <Box id="stats-icon-container" sx={{
-          p: 1.5,
-          bgcolor: 'primary.main',
-          borderRadius: 2,
-          color: 'white',
-          display: 'flex',
+      {variant !== 'compact' && (
+        <Box sx={{ 
+          display: 'flex', 
           alignItems: 'center',
-          justifyContent: 'center'
+          gap: 2, 
+          mb: 3,
+          p: 2,
+          bgcolor: 'grey.50',
+          borderRadius: 2
         }}>
-          <BarChart id="stats-bar-chart-icon" sx={{ fontSize: 20 }} />
+          <Box sx={{
+            p: 1,
+            bgcolor: 'primary.main',
+            borderRadius: 1.5,
+            color: 'white'
+          }}>
+            <BarChart sx={{ fontSize: 20 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+              סטטיסטיקות כלליות
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              תמונת מצב כללית של הפרוייקטים
+            </Typography>
+          </Box>
         </Box>
-        <Box id="stats-title-container">
-          <Typography 
-            id="stats-main-title"
-            variant="h6" 
-            sx={{ 
-              fontWeight: 700, 
-              color: 'text.primary',
-              mb: 0.5,
-              fontSize: '1.25rem'
-            }}
-          >
-            סטטיסטיקות כלליות
-          </Typography>
-          <Typography 
-            id="stats-subtitle"
-            variant="body2" 
-            sx={{ 
-              color: 'text.secondary',
-              fontSize: '0.875rem'
-            }}
-          >
-            תמונת מצב כללית של הפרוייקטים
-          </Typography>
-        </Box>
-      </Box>
+      )}
       
-      <Box id="stats-grid" sx={{ 
+      <Box sx={{ 
         display: 'grid', 
-        gridTemplateColumns: { 
-          xs: '1fr', 
-          sm: 'repeat(2, 1fr)', 
-          md: isSmallScreen ? 'repeat(2, 1fr)' : '1fr',
-          lg: '1fr'
+        gridTemplateColumns: {
+          xs: 'repeat(2, 1fr)',
+          sm: 'repeat(3, 1fr)',
+          md: variant === 'compact' ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
+          lg: variant === 'compact' ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)'
         },
-        gap: 2,
-        flex: 1,
-        minHeight: 0
+        gap: 2
       }}>
-        {statItems.map((item, index) => (
+        {displayItems.map((item, index) => (
           <Card
             key={index}
-            id={`stats-card-${index}`}
             elevation={0}
             sx={{
               bgcolor: item.bgColor,
-              border: '2px solid',
-              borderColor: item.borderColor,
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
+              border: `2px solid ${item.color}`,
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
               '&:hover': {
-                boxShadow: 4,
-                transform: 'translateY(-4px)'
+                transform: 'translateY(-2px)',
+                boxShadow: 3
               }
             }}
           >
-            <CardContent id={`stats-card-content-${index}`} sx={{ 
-              p: 2, 
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 2,
-              textAlign: 'left'
-            }}>
+            <CardContent sx={{ p: 2, textAlign: 'center' }}>
               <Avatar
-                id={`stats-card-avatar-${index}`}
                 sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: item.iconBg,
+                  width: 48,
+                  height: 48,
+                  bgcolor: item.color,
                   color: 'white',
-                  flexShrink: 0
+                  mx: 'auto',
+                  mb: 1
                 }}
               >
-                <item.icon id={`stats-card-icon-${index}`} sx={{ fontSize: 16 }} />
+                <item.icon />
               </Avatar>
               
-              <Box sx={{ flex: 1, minWidth: 0, mr: 2 }}>
-                <Typography
-                  id={`stats-card-description-${index}`}
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '0.7rem',
-                    lineHeight: 1.3,
-                    display: 'block',
-                    mb: 0.5
-                  }}
-                >
-                  {item.description}
-                </Typography>
-                
-                <Box
-                  sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    bgcolor: 'white',
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    borderColor: item.borderColor,
-                    color: item.color,
-                    fontWeight: 600,
-                    fontSize: '0.7rem',
-                    whiteSpace: 'nowrap',
-                    display: 'inline-block'
-                  }}
-                >
-                  {item.label}
-                </Box>
-              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: item.color,
+                  fontWeight: 600,
+                  mb: 1,
+                  fontSize: '0.875rem'
+                }}
+              >
+                {item.label}
+              </Typography>
               
               <Typography
-                id={`stats-card-value-${index}`}
                 variant="h6"
                 sx={{
                   color: item.color,
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  lineHeight: 1.2,
-                  flexShrink: 0,
-                  textAlign: 'right',
-                  minWidth: 'fit-content'
+                  fontWeight: 700,
+                  fontSize: '1.25rem'
                 }}
               >
                 {item.value}

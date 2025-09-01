@@ -8,12 +8,14 @@ interface PropertiesListProps {
   properties: Property[];
   selectedProperty: Property | null;
   onPropertySelect: (property: Property | null) => void;
+  currentSearchQuery?: string;
 }
 
 const PropertiesList: React.FC<PropertiesListProps> = ({
   properties,
   selectedProperty,
-  onPropertySelect
+  onPropertySelect,
+  currentSearchQuery
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -105,6 +107,11 @@ const PropertiesList: React.FC<PropertiesListProps> = ({
         <Typography id="properties-header-title" variant={isMobile ? 'subtitle1' : 'h6'} sx={{ fontWeight: 600, color: 'text.primary' }}>
           רשימת פרוייקטים
         </Typography>
+        {currentSearchQuery && (
+          <Typography id="properties-search-query" variant="caption" sx={{ color: 'primary.main', fontWeight: 500, mt: 0.5 }}>
+            חיפוש: {currentSearchQuery}
+          </Typography>
+        )}
         <Typography id="properties-header-count" variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary', mt: 0.5 }}>
           {properties.length} פרוייקטים נמצאו
         </Typography>
@@ -180,9 +187,12 @@ const PropertiesList: React.FC<PropertiesListProps> = ({
 
                   {/* Location */}
                   <Box id={`property-location-${property.id}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                    <LocationOn id={`property-location-icon-${property.id}`} sx={{ fontSize: isMobile ? 14 : 16, color: 'text.secondary' }} />
-                    <Typography id={`property-location-text-${property.id}`} variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary' }}>
+                    <LocationOn id={`property-location-icon-${property.id}`} sx={{ fontSize: isMobile ? 16 : 18, color: 'text.secondary' }} />
+                    <Typography id={`property-location-text-${property.id}`} variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                       {property.city} - {property.neighborhood}
+                      {property.isCityLevelCoordinates && (
+                        <span style={{ color: '#f59e0b', marginLeft: '4px', fontSize: '0.875em' }}>⚠️ *</span>
+                      )}
                     </Typography>
                   </Box>
 
@@ -194,14 +204,14 @@ const PropertiesList: React.FC<PropertiesListProps> = ({
                     mb: 1 
                   }}>
                     <Box id={`property-units-${property.id}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Business id={`property-units-icon-${property.id}`} sx={{ fontSize: isMobile ? 14 : 16, color: 'text.secondary' }} />
-                      <Typography id={`property-units-text-${property.id}`} variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary' }}>
+                      <Business id={`property-units-icon-${property.id}`} sx={{ fontSize: isMobile ? 16 : 18, color: 'text.secondary' }} />
+                      <Typography id={`property-units-text-${property.id}`} variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                         {property.totalUnits} יחידות
                       </Typography>
                     </Box>
                     <Box id={`property-subscribers-${property.id}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <People id={`property-subscribers-icon-${property.id}`} sx={{ fontSize: isMobile ? 14 : 16, color: 'text.secondary' }} />
-                      <Typography id={`property-subscribers-text-${property.id}`} variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary' }}>
+                      <People id={`property-subscribers-icon-${property.id}`} sx={{ fontSize: isMobile ? 16 : 18, color: 'text.secondary' }} />
+                      <Typography id={`property-subscribers-text-${property.id}`} variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                         {property.totalSubscribers.toLocaleString()}
                       </Typography>
                     </Box>
@@ -209,17 +219,18 @@ const PropertiesList: React.FC<PropertiesListProps> = ({
 
                   {/* Price and Competition */}
                   <Box id={`property-price-competition-${property.id}`} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Typography id={`property-price-${property.id}`} variant={isMobile ? 'subtitle2' : 'h6'} sx={{ fontWeight: 700, color: 'primary.main' }}>
+                    <Typography id={`property-price-${property.id}`} variant={isMobile ? 'h6' : 'h5'} sx={{ fontWeight: 700, color: 'primary.main', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
                       ₪{formatPrice(property.pricePerMeter)}
                     </Typography>
                     <Chip
                       id={`property-competition-${property.id}`}
                       label={`${property.competitionRatio.toFixed(1)}:1`}
-                      size={isMobile ? 'small' : 'small'}
+                      size={isMobile ? 'medium' : 'medium'}
                       sx={{
                         bgcolor: getCompetitionColor(property.competitionRatio),
                         color: 'white',
-                        fontWeight: 600
+                        fontWeight: 600,
+                        fontSize: { xs: '0.875rem', sm: '1rem' }
                       }}
                     />
                   </Box>

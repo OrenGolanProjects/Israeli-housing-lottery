@@ -61,3 +61,33 @@ export const calculateSuccessRate = (winners: number, subscribers: number): numb
   if (subscribers === 0) return 0;
   return (winners / subscribers) * 100;
 };
+
+/**
+ * Safely parse a string to a number with fallback
+ */
+export const safeParseFloat = (value: string | number | null | undefined, fallback: number = 0): number => {
+  if (typeof value === 'number') return value;
+  if (!value || typeof value !== 'string') return fallback;
+  
+  try {
+    const parsed = parseFloat(value.replace(/,/g, ''));
+    return isNaN(parsed) ? fallback : parsed;
+  } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Safely parse an integer with fallback
+ */
+export const safeParseInt = (value: string | number | null | undefined, fallback: number = 0): number => {
+  if (typeof value === 'number') return Math.floor(value);
+  if (!value || typeof value !== 'string') return fallback;
+  
+  try {
+    const parsed = parseInt(value.replace(/,/g, ''), 10);
+    return isNaN(parsed) ? fallback : parsed;
+  } catch {
+    return fallback;
+  }
+};

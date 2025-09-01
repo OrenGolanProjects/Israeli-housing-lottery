@@ -17,7 +17,6 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [isVisible, setIsVisible] = useState(false);
-  const [isOpening, setIsOpening] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [currentProperty, setCurrentProperty] = useState<Property | null>(null);
 
@@ -26,21 +25,18 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
       // OPENING: Set property, start opening animation
       setCurrentProperty(selectedProperty);
       setIsVisible(true);
-      setIsOpening(true);
       setIsClosing(false);
-      
-      // After opening animation completes, reset opening state
-      setTimeout(() => {
-        setIsOpening(false);
-      }, 400);
     } else if (!selectedProperty && currentProperty) {
       // CLOSING: Start closing animation, then hide after delay
       setIsClosing(true);
-      setTimeout(() => {
+      // Use proper animation timing instead of arbitrary setTimeout
+      const timer = setTimeout(() => {
         setIsVisible(false);
         setCurrentProperty(null);
         setIsClosing(false);
-      }, 400);
+      }, 300); // Match CSS transition duration
+      
+      return () => clearTimeout(timer);
     }
   }, [selectedProperty, currentProperty]);
 
@@ -61,15 +57,16 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
       right: 0,
       width: isMobile ? '100%' : 400,
       height: 'calc(100vh - 88px)',
-      zIndex: 1000,
+      zIndex: 1500,
       borderRadius: 0,
       overflow: 'auto',
       bgcolor: 'white',
-      borderLeft: 1,
-      borderColor: 'grey.200',
-      transform: isClosing ? 'translateX(100%)' : isOpening ? 'translateX(100%)' : 'translateX(0)',
-      transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-      opacity: isClosing ? 0.8 : isOpening ? 0.8 : 1
+      borderLeft: 2,
+      borderColor: 'primary.main',
+      boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+      transform: isClosing ? 'translateX(100%)' : 'translateX(0)',
+      transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+      opacity: isClosing ? 0 : 1
     }}>
       <Box id="property-details-content" sx={{ 
         p: isMobile ? 2 : 3,
@@ -116,8 +113,11 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
             {currentProperty.name}
           </Typography>
           
-          <Typography id="property-details-location" variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary' }}>
+          <Typography id="property-details-location" variant={isMobile ? 'body1' : 'subtitle1'} sx={{ color: 'text.secondary', fontSize: { xs: '1rem', sm: '1.125rem' }, fontWeight: 500 }}>
             {currentProperty.city} - {currentProperty.neighborhood}
+            {currentProperty.isCityLevelCoordinates && (
+              <span style={{ color: '#f59e0b', marginLeft: '4px', fontSize: '0.875em' }}>⚠️ *</span>
+            )}
           </Typography>
 
           <Box id="property-details-stats-grid" sx={{ 
@@ -133,10 +133,10 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
               border: 1,
               borderColor: 'grey.200'
             }}>
-              <Typography id="property-details-units-label" variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary', mb: 0.5 }}>
+              <Typography id="property-details-units-label" variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', mb: 0.5, fontSize: { xs: '0.875rem', sm: '1rem' }, fontWeight: 500 }}>
                 יחידות דיור
               </Typography>
-              <Typography id="property-details-units-value" variant={isMobile ? 'h6' : 'h5'} sx={{ fontWeight: 700, color: 'primary.main' }}>
+              <Typography id="property-details-units-value" variant={isMobile ? 'h5' : 'h4'} sx={{ fontWeight: 700, color: 'primary.main', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 {currentProperty.totalUnits}
               </Typography>
             </Box>
@@ -148,10 +148,10 @@ const PropertyDetailsPanel: React.FC<PropertyDetailsPanelProps> = ({
               border: 1,
               borderColor: 'grey.200'
             }}>
-              <Typography id="property-details-price-label" variant={isMobile ? 'caption' : 'body2'} sx={{ color: 'text.secondary', mb: 0.5 }}>
+              <Typography id="property-details-price-label" variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', mb: 0.5, fontSize: { xs: '0.875rem', sm: '1rem' }, fontWeight: 500 }}>
                 מחיר למ״ר
               </Typography>
-              <Typography id="property-details-price-value" variant={isMobile ? 'h6' : 'h5'} sx={{ fontWeight: 700, color: 'success.main' }}>
+              <Typography id="property-details-price-value" variant={isMobile ? 'h5' : 'h4'} sx={{ fontWeight: 700, color: 'success.main', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 ₪{currentProperty.pricePerMeter.toLocaleString()}
               </Typography>
             </Box>

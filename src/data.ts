@@ -1,76 +1,7 @@
 import type { ApiProperty, Property } from './types';
 
-export const convertApiProperty = (apiProp: ApiProperty): Property => {
-  const pricePerMeter = parseFloat(apiProp.PriceForMeter.replace(/,/g, ''));
-  const competitionRatio =
-    apiProp.Subscribers > 0
-      ? parseFloat((apiProp.Subscribers / apiProp.Winners).toFixed(1))
-      : 0;
-
-  const cityCoordinates: Record<string, [number, number]> = {
-    'תל אביב -יפו': [32.0853, 34.7818],
-    'חיפה': [32.7940, 34.9896],
-    'באר שבע': [31.2518, 34.7913],
-    'ירושלים': [31.7683, 35.2137],
-    'אשדוד': [31.8044, 34.6503],
-    'פתח תקווה': [32.0840, 34.8878],
-    'נתניה': [32.3328, 34.8600],
-    'ראשון לציון': [31.9522, 34.8033],
-    'רחובות': [31.8928, 34.8113],
-    'אשקלון': [31.6688, 34.5717],
-    'קריית גת': [31.6100, 34.7642],
-    'קריית שמונה': [33.2079, 35.5702],
-    'אופקים': [31.2739, 34.6200],
-    'ערד': [31.2628, 35.2147],
-    'דימונה': [31.0690, 35.0333],
-    'ירוחם': [30.9881, 34.9311],
-    'מצפה רמון': [30.6100, 34.8000],
-    'אילת': [29.5577, 34.9519],
-    'אריאל': [32.1044, 35.1797],
-    'בית שאן': [32.4971, 35.4962],
-    'טבריה': [32.7947, 35.5327],
-    'צפת': [32.9646, 35.4960],
-    'עכו': [32.9281, 35.0820],
-    'נהריה': [33.0089, 35.0981],
-    'קריית מוצקין': [32.8373, 35.0776],
-    'קריית ביאליק': [32.8273, 35.0857],
-    'קריית ים': [32.8493, 35.0683],
-    'קריית אתא': [32.8114, 35.1133],
-    'קריית טבעון': [32.7234, 35.1276],
-    'מודיעין עילית': [31.9322, 35.0442],
-    'ביתר עילית': [31.6889, 35.1144],
-    'אלעד': [32.0500, 34.9500],
-    'עמנואל': [31.9333, 35.2167],
-    'בית אל': [31.9333, 35.2167],
-    'קדומים': [32.2167, 35.1667],
-    'עלי': [32.0667, 35.2667],
-    'שילה': [32.0500, 35.3000],
-    'אלקנה': [32.1167, 35.0333],
-    'קרני שומרון': [32.1667, 35.1000],
-    'אורנית': [32.1333, 34.9333],
-    'קריית ארבע': [31.5333, 35.1000]
-  };
-
-  return {
-    id: apiProp._id,
-    name: apiProp.ProjectName,
-    city: apiProp.LamasName,
-    neighborhood: apiProp.Neighborhood,
-    pricePerMeter,
-    totalUnits: apiProp.LotteryHousingUnits,
-    totalSubscribers: apiProp.Subscribers,
-    totalWinners: apiProp.Winners,
-    competitionRatio,
-    status: apiProp.ProjectStatus,
-    provider: apiProp.ProviderName,
-    lotteryDate: apiProp.LotteryExecutionDate.split(' ')[0],
-    signupDeadline: apiProp.LotteryEndSignupDate.split(' ')[0],
-    constructionPermit: apiProp.ConstructionPermitName,
-    eligibility: apiProp.Eligibility,
-    marketingMethod: apiProp.MarketingMethodDesc,
-    coordinates: cityCoordinates[apiProp.LamasName] || [31.7683, 35.2137],
-  };
-};
+// Note: This file contains sample data for development/testing
+// In production, this should be replaced with actual API calls
 
 const sampleApiData: ApiProperty[] = [
   {
@@ -290,7 +221,93 @@ const sampleApiData: ApiProperty[] = [
   }
 ];
 
-export const sampleProperties: Property[] = sampleApiData.map(convertApiProperty);
+// City coordinates mapping for sample data
+const CITY_COORDINATES: { [city: string]: [number, number] } = {
+  'תל אביב -יפו': [32.0853, 34.7818],
+  'ירושלים': [31.7683, 35.2137],
+  'חיפה': [32.7940, 34.9896],
+  'באר שבע': [31.2500, 34.7900],
+  'ראשון לציון': [31.9640, 34.8016],
+  'פתח תקווה': [32.0849, 34.8720],
+  'אשדוד': [31.8000, 34.6500],
+  'נתניה': [32.3300, 34.8600],
+  'חולון': [32.0200, 34.7800],
+  'רמת גן': [32.0700, 34.8100],
+  'הרצליה': [32.1700, 34.8400],
+  'כפר סבא': [32.1700, 34.9000],
+  'רחובות': [31.8900, 34.8100],
+  'אשקלון': [31.6700, 34.5700],
+  'קריית גת': [31.6100, 34.7600],
+  'בית שמש': [31.7500, 35.0000],
+  'קריית ביאליק': [32.8300, 35.0800],
+  'קריית מוצקין': [32.8300, 35.0800],
+  'קריית ים': [32.8300, 35.0800],
+  'קריית אתא': [32.8300, 35.0800],
+  'קריית שמונה': [33.2100, 35.5700],
+  'טבריה': [32.7900, 35.5300],
+  'צפת': [32.9700, 35.4900],
+  'עכו': [32.9300, 35.0800],
+  'נצרת': [32.7000, 35.3000],
+  'אום אל-פחם': [32.5200, 35.1500],
+  'נצרת עילית': [32.7000, 35.3000],
+  'אריאל': [32.1000, 35.1000],
+  'ביתר עילית': [31.7000, 35.1000],
+  'מודיעין עילית': [31.7000, 35.1000],
+  'אלעד': [32.0500, 34.9500],
+  'אור יהודה': [32.0300, 34.8500],
+  'יהוד-מונוסון': [32.0300, 34.8500],
+  'גבעת שמואל': [32.0300, 34.8500],
+  'גבעתיים': [32.0700, 34.8100],
+  'קריית אונו': [32.0300, 34.8500],
+  'קריית מלאכי': [31.7300, 34.7600]
+};
+
+// Helper function to get city coordinates
+const getCityCoordinates = (city: string): [number, number] => {
+  return CITY_COORDINATES[city] || [31.7683, 35.2137]; // Default to Jerusalem
+};
+
+// Helper function to parse price string to number
+const parsePrice = (priceStr: string): number => {
+  if (!priceStr) return 0;
+  const cleanPrice = priceStr.replace(/[^\d.]/g, '');
+  return parseFloat(cleanPrice) || 0;
+};
+
+// Helper function to calculate competition ratio
+const calculateCompetitionRatio = (subscribers: number, winners: number): number => {
+  if (winners === 0) return 0;
+  return subscribers / winners;
+};
+
+// Export sample data for development/testing
+export const sampleProperties: Property[] = sampleApiData.map(apiProp => {
+  const city = apiProp.LamasName || 'Unknown City';
+  const coordinates = getCityCoordinates(city);
+  const pricePerMeter = parsePrice(apiProp.PriceForMeter);
+  const competitionRatio = calculateCompetitionRatio(apiProp.Subscribers || 0, apiProp.Winners || 0);
+  
+  return {
+    id: apiProp.ProjectId,
+    name: apiProp.ProjectName || 'Unnamed Project',
+    city: city,
+    neighborhood: apiProp.Neighborhood || 'Unknown Neighborhood',
+    pricePerMeter: pricePerMeter,
+    totalUnits: apiProp.LotteryHousingUnits || 0,
+    totalSubscribers: apiProp.Subscribers || 0,
+    totalWinners: apiProp.Winners || 0,
+    competitionRatio: competitionRatio,
+    status: apiProp.ProjectStatus || 'Unknown',
+    provider: apiProp.ProviderName || 'Unknown Provider',
+    lotteryDate: apiProp.LotteryExecutionDate || '',
+    signupDeadline: apiProp.LotteryEndSignupDate || '',
+    constructionPermit: apiProp.ConstructionPermitName || 'Unknown',
+    eligibility: apiProp.Eligibility || 'Unknown',
+    marketingMethod: apiProp.MarketingMethodDesc || 'Unknown',
+    coordinates: coordinates,
+    isCityLevelCoordinates: true
+  };
+});
 
 export const cities = Array.from(new Set(sampleProperties.map(p => p.city)));
 export const statuses = Array.from(new Set(sampleProperties.map(p => p.status)));

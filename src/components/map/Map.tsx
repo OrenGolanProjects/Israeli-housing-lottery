@@ -1,11 +1,42 @@
-import { useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useRef, useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { DivIcon, Map as LeafletMap } from 'leaflet';
-import { Box, Paper, Typography, Avatar, useMediaQuery, useTheme, Chip } from '@mui/material';
-import { LocationOn, Layers, Info, ZoomIn, ZoomOut } from '@mui/icons-material';
+import { Box, Paper, Typography, Avatar, useMediaQuery, useTheme, CircularProgress } from '@mui/material';
+import { LocationOn, ZoomIn, ZoomOut } from '@mui/icons-material';
 import type { Property } from '../../types';
-import { getCompetitionTextColor, getCompetitionHexColor } from '../../utils/formatters';
 import 'leaflet/dist/leaflet.css';
+
+// Fix for Leaflet marker icons in React
+import L from 'leaflet';
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl: unknown })._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom CSS for city banner markers
+const cityBannerStyles = `
+  .city-banner-marker {
+    transition: all 0.3s ease;
+  }
+  
+  .city-banner-marker:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+  }
+  
+  .city-banner-marker div {
+    transition: all 0.3s ease;
+  }
+`;
+
+// Inject custom styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = cityBannerStyles;
+  document.head.appendChild(styleElement);
+}
 
 interface MapProps {
   properties: Property[];
@@ -21,6 +52,8 @@ const Map: React.FC<MapProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const mapRef = useRef<LeafletMap>(null);
+  const [isFetchingCoordinates, setIsFetchingCoordinates] = useState(false);
+  const [usingPreciseCoordinates, setUsingPreciseCoordinates] = useState(false);
 
   const israelCenter: [number, number] = [31.7683, 35.2137];
   const israelBounds: [[number, number], [number, number]] = [
@@ -61,117 +94,6 @@ const Map: React.FC<MapProps> = ({
     }
   }, [selectedProperty]);
 
-  const createCustomMarker = (property: Property) => {
-    const hexColor = getCompetitionHexColor(property.competitionRatio);
-    const ratio = property.competitionRatio.toFixed(0);
-    const isSelected = selectedProperty?.id === property.id;
-    
-    // Get complementary colors that work well together
-    const getMarkerColors = (bgColor: string, isSelected: boolean) => {
-      switch (bgColor) {
-        case '#10b981': // Green - low competition
-          return {
-            background: isSelected ? '#059669' : '#10b981', // Darker green when selected
-            border: isSelected ? '#047857' : '#059669',
-            text: '#ffffff',
-            shadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
-          };
-        case '#f59e0b': // Yellow - medium competition
-          return {
-            background: isSelected ? '#d97706' : '#f59e0b', // Darker yellow when selected
-            border: isSelected ? '#b45309' : '#d97706',
-            text: '#ffffff',
-            shadow: '0 4px 12px rgba(245, 158, 11, 0.4)'
-          };
-        case '#f97316': // Coral - high competition
-          return {
-            background: isSelected ? '#ea580c' : '#f97316', // Darker coral when selected
-            border: isSelected ? '#c2410c' : '#ea580c',
-            text: '#ffffff',
-            shadow: '0 4px 12px rgba(249, 115, 22, 0.4)'
-          };
-        default: // Gray
-          return {
-            background: isSelected ? '#6b7280' : '#9ca3af',
-            border: isSelected ? '#4b5563' : '#6b7280',
-            text: '#ffffff',
-            shadow: '0 4px 12px rgba(156, 163, 175, 0.4)'
-          };
-      }
-    };
-    
-    const colors = getMarkerColors(hexColor, isSelected);
-    
-    return new DivIcon({
-      html: `
-        <div style="
-          background: ${colors.background};
-          color: ${colors.text};
-          width: ${isSelected ? '48px' : '40px'};
-          height: ${isSelected ? '48px' : '40px'};
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 900;
-          font-size: ${isSelected ? '16px' : '14px'};
-          border: 3px solid ${colors.border};
-          box-shadow: ${colors.shadow};
-          cursor: pointer;
-          transition: all 0.3s ease;
-          transform: ${isSelected ? 'scale(1.1)' : 'scale(1)'};
-          text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-          position: relative;
-        " onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='${isSelected ? 'scale(1.1)' : 'scale(1)'}'">
-          <span style="
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-          ">${ratio}</span>
-        </div>
-      `,
-      className: 'custom-marker',
-      iconSize: [isSelected ? 48 : 40, isSelected ? 48 : 40],
-      iconAnchor: [isSelected ? 24 : 20, isSelected ? 48 : 40],
-      popupAnchor: [0, isSelected ? -48 : -40]
-    });
-  };
-
-  const handleMarkerClick = (property: Property) => {
-    if (selectedProperty?.id === property.id) {
-      onPropertySelect(null);
-      // Reset to Israel view when deselecting
-      if (mapRef.current) {
-        mapRef.current.fitBounds(israelBounds, { padding: [20, 20] });
-      }
-    } else {
-      onPropertySelect(property);
-      // Zoom to the selected property immediately with smooth animation
-      if (mapRef.current) {
-        mapRef.current.setView(
-          property.coordinates,
-          15,
-          {
-            animate: true,
-            duration: 1.5,
-            easeLinearity: 0.25
-          }
-        );
-        
-        // Add a subtle bounce effect to the marker
-        const markerElement = document.querySelector(`[data-property-id="${property.id}"]`) as HTMLElement;
-        if (markerElement) {
-          markerElement.style.animation = 'bounce 0.6s ease-in-out';
-          setTimeout(() => {
-            if (markerElement) {
-              markerElement.style.animation = '';
-            }
-          }, 600);
-        }
-      }
-    }
-  };
-
   const handleZoomIn = () => {
     if (mapRef.current) {
       mapRef.current.zoomIn();
@@ -191,6 +113,96 @@ const Map: React.FC<MapProps> = ({
     // Clear property selection when resetting view
     onPropertySelect(null);
   };
+
+  const fetchPropertyCoordinates = async (property: Property): Promise<[number, number]> => {
+    setIsFetchingCoordinates(true);
+    setUsingPreciseCoordinates(false);
+    
+    try {
+      // Try to get precise coordinates using property name + neighborhood + city
+      const searchQuery = `${property.name}, ${property.neighborhood}, ${property.city}, Israel`;
+      const encodedQuery = encodeURIComponent(searchQuery);
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=1&countrycodes=il`;
+      
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'IsraeliHousingLottery/1.0' }
+      });
+      
+      if (response.ok) {
+        const results = await response.json();
+        if (results && results.length > 0) {
+          const preciseCoords: [number, number] = [parseFloat(results[0].lat), parseFloat(results[0].lon)];
+          console.log('📍 Found precise coordinates for property:', property.name, 'at:', preciseCoords);
+          setUsingPreciseCoordinates(true);
+          return preciseCoords;
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to fetch precise coordinates for property:', property.name, error);
+    }
+    
+    // Fallback to city coordinates
+    console.log('📍 Using city coordinates for property:', property.name);
+    setUsingPreciseCoordinates(false);
+    return property.coordinates;
+  };
+
+  const handlePropertySelect = async (property: Property) => {
+    if (selectedProperty?.id === property.id) {
+      onPropertySelect(null);
+      setUsingPreciseCoordinates(false);
+      // Reset to Israel view when deselecting
+      if (mapRef.current) {
+        mapRef.current.fitBounds(israelBounds, { padding: [20, 20] });
+      }
+    } else {
+      onPropertySelect(property);
+      
+      // Fetch precise coordinates and zoom to property
+      const preciseCoords = await fetchPropertyCoordinates(property);
+      
+      if (mapRef.current) {
+        mapRef.current.setView(
+          preciseCoords,
+          16, // Higher zoom for property detail view
+          {
+            animate: true,
+            duration: 1.5,
+            easeLinearity: 0.25
+          }
+        );
+      }
+    }
+    setIsFetchingCoordinates(false);
+  };
+
+  // Filter out properties with invalid coordinates
+  const validProperties = properties.filter(prop => 
+    prop.coordinates && 
+    prop.coordinates[0] !== 0 && 
+    prop.coordinates[1] !== 0 &&
+    !isNaN(prop.coordinates[0]) && 
+    !isNaN(prop.coordinates[1])
+  );
+
+  if (validProperties.length === 0) {
+    return (
+      <Box sx={{ 
+        flex: 1, 
+        bgcolor: 'blue.50', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        p: 3
+      }}>
+        <Paper elevation={0} sx={{ p: 4, textAlign: 'center', bgcolor: 'white' }}>
+          <Typography variant="h6" color="text.secondary">
+            אין נתונים זמינים למפה
+          </Typography>
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box id="map-main-container" sx={{ 
@@ -241,7 +253,7 @@ const Map: React.FC<MapProps> = ({
                 מפת ישראל - הגרלות דיור
               </Typography>
               <Typography id="map-header-subtitle" variant={isMobile ? 'body2' : 'body1'} sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                מציג {properties.length} פרוייקטים
+                נמצאו {validProperties.length} פרוייקטים
               </Typography>
             </Box>
           </Paper>
@@ -291,67 +303,65 @@ const Map: React.FC<MapProps> = ({
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
               
-              {properties.map((property) => (
-                <Marker
-                  key={`${property.id}-${selectedProperty?.id === property.id ? 'selected' : 'normal'}`}
-                  position={property.coordinates}
-                  icon={createCustomMarker(property)}
-                  eventHandlers={{
-                    click: () => handleMarkerClick(property)
-                  }}
-                  data-property-id={property.id}
-                >
-                  <Popup>
-                    <Box id={`map-popup-content-${property.id}`} sx={{ p: 1, minWidth: 200 }}>
-                      <Typography id={`map-popup-title-${property.id}`} variant="h6" sx={{ fontWeight: 700, mb: 1, textAlign: 'center' }}>
-                        {property.name}
-                      </Typography>
-                      <Typography id={`map-popup-location-${property.id}`} variant="body2" sx={{ color: 'text.secondary', mb: 1, textAlign: 'center' }}>
-                        {property.city} - {property.neighborhood}
-                      </Typography>
-                      <Box id={`map-popup-stats-${property.id}`} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 1 }}>
-                        <Box id={`map-popup-price-${property.id}`} sx={{ textAlign: 'center' }}>
-                          <Typography id={`map-popup-price-value-${property.id}`} variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                            ₪{property.pricePerMeter.toLocaleString('he-IL')}
-                          </Typography>
-                          <Typography id={`map-popup-price-label-${property.id}`} variant="caption" sx={{ color: 'text.secondary' }}>
-                            למ״ר
-                          </Typography>
-                        </Box>
-                        <Box id={`map-popup-competition-${property.id}`} sx={{ textAlign: 'center' }}>
-                          <Typography 
-                            id={`map-popup-competition-value-${property.id}`}
-                            variant="subtitle2" 
-                            sx={{ 
-                              fontWeight: 700, 
-                              color: getCompetitionTextColor(property.competitionRatio) 
-                            }}
-                          >
-                            {property.competitionRatio.toFixed(1)}:1
-                          </Typography>
-                          <Typography id={`map-popup-competition-label-${property.id}`} variant="caption" sx={{ color: 'text.secondary' }}>
-                            תחרותיות
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box id={`map-popup-chips-${property.id}`} sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
-                        <Chip 
-                          id={`map-popup-status-${property.id}`}
-                          label={property.status} 
-                          size="small" 
-                          color={property.status === 'פתוח להרשמה' ? 'success' : 'default'}
-                        />
-                        <Chip 
-                          id={`map-popup-units-${property.id}`}
-                          label={`${property.totalUnits} יחידות`} 
-                          size="small" 
-                          variant="outlined"
-                        />
-                      </Box>
-                    </Box>
-                  </Popup>
-                </Marker>
-              ))}
+              {(() => {
+                const cityGroups = validProperties.reduce((groups, property) => {
+                  const city = property.city;
+                  if (!groups[city]) {
+                    groups[city] = [];
+                  }
+                  groups[city].push(property);
+                  return groups;
+                }, {} as Record<string, Property[]>);
+
+                return Object.entries(cityGroups).map(([city, cityProperties]) => {
+                  const firstProperty = cityProperties[0];
+                  const coordinates = firstProperty.coordinates;
+                  
+                  return (
+                    <Marker
+                      key={`city-${city}`}
+                      position={coordinates}
+                      icon={new DivIcon({
+                        html: `
+                          <div style="
+                            background: rgba(25, 118, 210, 0.9);
+                            color: white;
+                            padding: 8px 12px;
+                            border-radius: 20px;
+                            font-weight: 600;
+                            font-size: 14px;
+                            white-space: nowrap;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            border: 2px solid white;
+                            text-align: center;
+                            min-width: 80px;
+                          ">
+                            נמצאו ${cityProperties.length} נכסים
+                          </div>
+                        `,
+                        className: 'city-banner-marker',
+                        iconSize: [120, 40],
+                        iconAnchor: [60, 20]
+                      })}
+                      eventHandlers={{
+                        click: () => {
+                          if (cityProperties.length === 1) {
+                            handlePropertySelect(cityProperties[0]);
+                          } else {
+                            // Zoom to city view
+                            if (mapRef.current) {
+                              mapRef.current.setView(coordinates, 12, {
+                                animate: true,
+                                duration: 1.5
+                              });
+                            }
+                          }
+                        }
+                      }}
+                    />
+                  );
+                });
+              })()}
             </MapContainer>
 
             <Box id="map-zoom-controls" sx={{ 
@@ -435,30 +445,33 @@ const Map: React.FC<MapProps> = ({
             }}
           >
             <Box id="map-legend-header" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: isMobile ? 1 : 1.5 }}>
-              <Layers id="map-legend-icon" color="action" />
               <Typography id="map-legend-title" variant={isMobile ? 'caption' : 'subtitle2'} sx={{ fontWeight: 700, color: 'text.primary' }}>
-                מקרא תחרותיות
+                מקרא מפה
               </Typography>
             </Box>
-            <Box id="map-legend-items" sx={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 0.5 : 1 }}>
-              <Box id="map-legend-low" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography id="map-legend-low-text" variant="caption" sx={{ color: 'text.secondary' }}>
-                  נמוכה (עד 6)
+            <Box id="map-legend-content" sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box id="map-legend-banner" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography id="map-legend-banner-text" variant="caption" sx={{ color: 'text.secondary' }}>
+                  באנר עיר
                 </Typography>
-                <Box id="map-legend-low-dot" sx={{ width: isMobile ? 8 : 12, height: isMobile ? 8 : 12, bgcolor: 'success.main', borderRadius: '50%', boxShadow: 1 }} />
+                <Box id="map-legend-banner-example" sx={{ 
+                  width: isMobile ? 60 : 80, 
+                  height: isMobile ? 20 : 25, 
+                  bgcolor: 'rgba(25, 118, 210, 0.9)', 
+                  borderRadius: 2, 
+                  boxShadow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Typography variant="caption" sx={{ color: 'white', fontSize: '10px', fontWeight: 600 }}>
+                    3 נכסים
+                  </Typography>
+                </Box>
               </Box>
-              <Box id="map-legend-medium" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography id="map-legend-medium-text" variant="caption" sx={{ color: 'text.secondary' }}>
-                  בינונית (6-8)
-                </Typography>
-                <Box id="map-legend-medium-dot" sx={{ width: isMobile ? 8 : 12, height: isMobile ? 8 : 12, bgcolor: 'warning.main', borderRadius: '50%', boxShadow: 1 }} />
-              </Box>
-              <Box id="map-legend-high" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography id="map-legend-high-text" variant="caption" sx={{ color: 'text.secondary' }}>
-                  גבוהה (8+)
-                </Typography>
-                <Box id="map-legend-high-dot" sx={{ width: isMobile ? 8 : 12, height: isMobile ? 8 : 12, bgcolor: '#f97316', borderRadius: '50%', boxShadow: 1 }} />
-              </Box>
+              <Typography id="map-legend-info" variant="caption" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+                לחץ על באנר לראות פרטי הפרוייקטים
+              </Typography>
             </Box>
           </Paper>
         </Box>
@@ -474,17 +487,22 @@ const Map: React.FC<MapProps> = ({
             sx={{ 
               bgcolor: 'rgba(255,255,255,0.9)', 
               p: isMobile ? 1 : 1.5, 
-              borderRadius: 3, 
-              boxShadow: 3, 
+              borderRadius: 2, 
+              boxShadow: 2, 
               border: 1, 
               borderColor: 'grey.200' 
             }}
           >
             <Box id="map-info-content" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-              <Info id="map-info-icon" sx={{ fontSize: isMobile ? 14 : 16 }} />
               <Typography id="map-info-text" variant="caption" sx={{ fontWeight: 500 }}>
-                {selectedProperty ? 'לחץ על סימון לסגירה' : 'לחץ על סימון לראות פרטים'}
+                {isFetchingCoordinates ? 'מחפש מיקום מדויק...' : 
+                 selectedProperty ? 
+                   (usingPreciseCoordinates ? 'מיקום מדויק נמצא - לחץ על באנר לסגירה' : 'מיקום עיר - לחץ על באנר לסגירה') : 
+                   'לחץ על באנר לראות פרטי הפרוייקטים'}
               </Typography>
+              {isFetchingCoordinates && (
+                <CircularProgress size={16} color="primary" />
+              )}
             </Box>
           </Paper>
         </Box>

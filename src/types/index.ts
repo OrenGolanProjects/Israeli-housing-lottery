@@ -60,6 +60,7 @@ export interface Property {
   eligibility: string;
   marketingMethod: string;
   coordinates: [number, number];
+  isCityLevelCoordinates?: boolean; // Flag to indicate if coordinates are city-level (with asterisk warning)
 }
 
 export interface FilterState {

@@ -109,27 +109,25 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                   fontWeight: 800,
                   color: 'text.primary',
                   mb: 1,
-                  fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+                  fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' },
                   letterSpacing: '-0.02em',
                   lineHeight: 1.2,
                   textShadow: '0 1px 2px rgba(0,0,0,0.05)'
                 }}
               >
-                מסננים
+                סינון פרוייקטים
               </Typography>
               <Typography
                 id="filters-subtitle"
-                variant="body1"
+                variant={isMobile ? 'body1' : 'subtitle1'}
                 sx={{
                   color: 'text.secondary',
-                  display: 'block',
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
                   fontWeight: 500,
-                  opacity: 0.8,
                   lineHeight: 1.4
                 }}
               >
-                לחץ לסינון פרוייקטים לפי קריטריונים
+                מצא את הפרוייקט המושלם עבורך
               </Typography>
             </Box>
           </Box>

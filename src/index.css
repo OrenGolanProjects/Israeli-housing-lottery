@@ -1,5 +1,5 @@
-/* Hebrew Font Support */
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
@@ -9,8 +9,8 @@
 
 html, body {
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px; /* Base font size reduction */
+  font-family: 'Heebo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px; /* Increased base font size for better readability */
   overflow: hidden;
 }
 
@@ -20,14 +20,14 @@ html, body {
   flex-direction: column;
 }
 
-/* RTL Support */
+
 [dir="rtl"] {
   text-align: right;
 }
 
-/* Custom Scrollbar */
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px; /* Slightly wider scrollbar */
 }
 
 ::-webkit-scrollbar-track {
@@ -36,7 +36,7 @@ html, body {
 
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -45,32 +45,61 @@ html, body {
 
 .hebrew-text {
   font-family: 'Heebo', sans-serif;
+  font-weight: 500; /* Better weight for Hebrew text */
 }
 
-/* Global font size reduction for better readability */
+/* Global font size improvements for better readability */
 * {
   font-size: inherit;
 }
 
-/* Ensure MUI components use smaller fonts */
+/* Ensure MUI components use larger fonts */
 .MuiTypography-root {
   font-size: inherit !important;
 }
 
-/* Specific adjustments for common text elements */
-.MuiTypography-h1 { font-size: 1.75rem !important; }
-.MuiTypography-h2 { font-size: 1.5rem !important; }
-.MuiTypography-h3 { font-size: 1.25rem !important; }
-.MuiTypography-h4 { font-size: 1.125rem !important; }
-.MuiTypography-h5 { font-size: 1rem !important; }
-.MuiTypography-h6 { font-size: 0.875rem !important; }
-.MuiTypography-subtitle1 { font-size: 0.875rem !important; }
-.MuiTypography-subtitle2 { font-size: 0.75rem !important; }
-.MuiTypography-body1 { font-size: 0.875rem !important; }
-.MuiTypography-body2 { font-size: 0.75rem !important; }
-.MuiTypography-button { font-size: 0.75rem !important; }
-.MuiTypography-caption { font-size: 0.625rem !important; }
-.MuiTypography-overline { font-size: 0.625rem !important; }
+/* Specific adjustments for common text elements - Larger and more professional */
+.MuiTypography-h1 { font-size: 2.5rem !important; font-weight: 700 !important; }
+.MuiTypography-h2 { font-size: 2rem !important; font-weight: 600 !important; }
+.MuiTypography-h3 { font-size: 1.75rem !important; font-weight: 600 !important; }
+.MuiTypography-h4 { font-size: 1.5rem !important; font-weight: 600 !important; }
+.MuiTypography-h5 { font-size: 1.25rem !important; font-weight: 600 !important; }
+.MuiTypography-h6 { font-size: 1.125rem !important; font-weight: 600 !important; }
+.MuiTypography-subtitle1 { font-size: 1.125rem !important; font-weight: 500 !important; }
+.MuiTypography-subtitle2 { font-size: 1rem !important; font-weight: 500 !important; }
+.MuiTypography-body1 { font-size: 1.125rem !important; font-weight: 400 !important; }
+.MuiTypography-body2 { font-size: 1rem !important; font-weight: 400 !important; }
+.MuiTypography-button { font-size: 1rem !important; font-weight: 600 !important; }
+.MuiTypography-caption { font-size: 0.875rem !important; font-weight: 400 !important; }
+
+/* Professional text styling */
+.professional-text {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.professional-header {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Improved readability for small screens */
+@media (max-width: 768px) {
+  html, body {
+    font-size: 18px; /* Even larger on mobile for better touch interaction */
+  }
+  
+  .MuiTypography-h1 { font-size: 2rem !important; }
+  .MuiTypography-h2 { font-size: 1.75rem !important; }
+  .MuiTypography-h3 { font-size: 1.5rem !important; }
+  .MuiTypography-h4 { font-size: 1.25rem !important; }
+  .MuiTypography-h5 { font-size: 1.125rem !important; }
+  .MuiTypography-h6 { font-size: 1rem !important; }
+}
 
 /* Form elements and other MUI components */
 .MuiInputLabel-root { font-size: 0.75rem !important; }
@@ -308,4 +337,28 @@ html, body {
 
 .leaflet-popup-tip {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+
+
+
+@media (max-width: 600px) {
+  #map-main-container {
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+}
+
+#property-details-panel {
+  position: fixed !important;
+  top: 88px !important;
+  right: 0 !important;
+  z-index: 1500 !important;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
