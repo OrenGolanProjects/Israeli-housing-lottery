@@ -1,69 +1,51 @@
-# React + TypeScript + Vite
+# Israeli Housing Lottery Map
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive React TypeScript application for exploring Israeli government housing lottery projects with interactive maps and advanced filtering capabilities.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🗺️ **Interactive Map**: Visualize housing lottery projects across Israel using Leaflet maps
+- 🔍 **Advanced Filtering**: Filter by city, price, status, construction permits, and eligibility types
+- 📊 **Real-time Statistics**: View project statistics including competition ratios and pricing
+- 📱 **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- 🌐 **Hebrew RTL Support**: Full right-to-left language support for Hebrew content
+- 🎯 **Property Details**: Detailed information panels for each housing project
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React 18+ with TypeScript
+- **Build Tool**: Vite
+- **UI Framework**: Material-UI (MUI)
+- **Maps**: Leaflet with React-Leaflet
+- **State Management**: Zustand
+- **Styling**: MUI Theme with RTL support
+- **Data**: Israeli government housing lottery API integration
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+```bash
+# Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `src/components/` - React components organized by feature
+- `src/types/` - TypeScript interfaces and type definitions
+- `src/hooks/` - Custom React hooks for state management
+- `src/utils/` - Utility functions for data processing and formatting
+- `src/services/` - API services and data fetching logic
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Data Source
+
+This application integrates with the Israeli government's housing lottery data API to provide real-time information about available housing projects, competition ratios, and project details.
+
+## License
+
+MIT License
